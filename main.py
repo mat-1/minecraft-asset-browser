@@ -333,7 +333,10 @@ async def view_packages(request):
 	return web.Response(
 		body=data,
 		content_type=mimetype,
-		charset='utf8'
+		charset='utf8',
+		headers={
+			'Access-Control-Allow-Origin': '*'
+		}
 	)
 
 
