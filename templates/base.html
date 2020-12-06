@@ -1,0 +1,76 @@
+<!doctype html>
+<html>
+<head>
+	{% block head %}
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<style>
+body {
+	font-family: sans-serif;
+	background-color: #1f1f1f;
+	color: #fefefe
+}
+a {
+	color: #eee;
+	text-decoration: none
+}
+.folder:hover, .file:hover {
+	background-color: rgba(255,255,255,.1);
+}
+.folder:active, .file:hover {
+	background-color: rgba(255,255,255,.2);
+}
+.folder a, .file a {
+	text-decoration: none!important;
+}
+a:hover {
+	text-decoration: underline
+}
+.folder, .file {
+	list-style: none;
+	position: relative;
+	right: 1.2em;
+	width: 100%;
+	min-width: 20em	
+}
+.folder {
+	background: url('https://cdn.matdoes.dev/images/fileicons/foldericon.png') no-repeat .2em .2em;
+}
+.txt {
+	background: url('https://cdn.matdoes.dev/images/fileicons/txticon.png') no-repeat .2em .2em;
+}
+.img {
+	background: url('https://cdn.matdoes.dev/images/fileicons/imgicon.png') no-repeat .2em .2em;
+}
+.audio {
+	background: url('https://cdn.matdoes.dev/images/fileicons/audioicon.png') no-repeat .2em .2em;
+}
+.unknownfile, .javaclass {
+	background: url('https://cdn.matdoes.dev/images/fileicons/blankicon.png') no-repeat .2em .2em;
+}
+.folder a, .file a {
+	position: relative;
+	left: 1.4em;
+  display: inline-block;
+  width: 100%;
+	padding: .2em 0;
+}
+main {
+	width: max-content;
+	min-width: 20%;
+	padding: 0 10vw
+}
+.folderlist {
+	width: min-content
+}
+</style>
+	{% endblock %}
+</head>
+<body>
+	{% block backbutton %}<a href="{% block backurl %}./{% endblock %}">&lt;</a>{% endblock %}
+	<main>
+	{% block main %}
+
+	{% endblock %}
+	</main>
+</body>
+</html>

@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block backbutton %}{% endblock %}
+
+{% block main %}
+<h1>Minecraft assets</h1>
+<ul>
+	{% for version in data.versions %}
+		<li><a href="/versions/{{version.id}}">{{ version.id }}</a></li>
+	{% endfor %}
+<ul>
+{% endblock %}

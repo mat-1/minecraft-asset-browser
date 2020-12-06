@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block backurl %}{% if path %}./{% else %}/versions/{{ version_id }}{% endif %}{% endblock %}
+
+{% block main %}
+<h1>{{ version_id }}/packages{% if path %}/{{ path }}{% endif %}</h1>
+<ul class="filelist">
+	{% for file in filenames %}
+		{% if '.' in file.fullpath.split('/')[-1] %}
+			{% set fileext = file.fullpath.split('/')[-1].split('.')[-1] %}
+			{% set file_class = {
+				'png': 'img file',
+				'ogg': 'audio file',
+				'mus': 'audio file',
+			}.get(fileext, 'txt file') %}
+		{% else %}
+			{% set file_class = 'folder' %}
+		{% endif %}
+
+		<li class="{{ file_class }}"><a href="{{ file.fullpath }}">{{ file.dirname }}</a></li>
+	{% endfor %}
+</ul>
+{% endblock %}

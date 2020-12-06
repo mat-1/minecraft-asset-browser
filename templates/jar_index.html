@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block backurl %}
+	{% if path %}/versions/{{ version_id }}/downloads/{{ jarname }}/{{ '/'.join(removelastitem(path.split('/'))) }}
+	{% else %}/versions/{{ version_id }}
+	{% endif %}
+	{% if show_class_files %}?class=true{% endif %}
+{% endblock %}
+
+{% block main %}
+<h1>{{ version_id }}/{{ jarname }}{% if path %}/{{ path }}{% endif %}</h1>
+<ul class="folderlist">
+	{% for file in files %}
+		{% if '.' in file.fullpath.split('/')[-1] %}
+			{% set fileext = file.fullpath.split('/')[-1].split('.')[-1] %}
+			{% set file_class = {
+				'png': 'img file',
+				'txt': 'txt file',
+				'json': 'txt file',
+				'class': 'javaclass file'
+			}.get(fileext, 'unknownfile file') %}
+		{% else %}
+			{% set file_class = 'folder' %}
+		{% endif %}
+		{% if file.name %}
+		<li class="{{ file_class }}">
+			<a href="/versions/{{ version_id }}/downloads/{{ jarname }}/{{ file.fullpath }}{% if show_class_files %}?class=true{% endif %}">{{ file.name }}</a>
+		</li>
+		{% endif %}
+	{% endfor %}
+<ul>
+{% endblock %}

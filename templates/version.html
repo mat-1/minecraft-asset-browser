@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block backurl %}/{% endblock %}
+
+{% block main %}
+		<h1>{{ data.id }}</h1>
+		<i>Released {{ timeago(data.releaseTime) }}</i>
+		<ul class="folderlist">
+		{% for download in data.downloads %}
+			{% set download_url = data.downloads[download].url %}
+			{% if '.' in download_url.split('/')[-1] %}
+				{% set fileext = download_url.split('/')[-1].split('.')[-1] %}
+				{% set file_class = {
+					'png': 'img file',
+					'txt': 'txt file',
+					'json': 'txt file',
+					'class': 'javaclass file'
+				}.get(fileext, 'unknownfile file') %}
+
+			{% else %}
+				{% set file_class = 'folder' %}
+			{% endif %}
+			<li class="{{ file_class }}">
+				<a href="/versions/{{ data.id}}/downloads/{{ download }}/">{{ download }}</a>
+			</li>
+		{% endfor %}
+		</ul>
+		<a href="/versions/{{ data.id }}/packages/">View {{ data.assetIndex.id }} assets</a>
+{% endblock %}
