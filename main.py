@@ -175,7 +175,6 @@ async def get_jar_files(url, search_path='/', show_classfiles=False):
 				'name': name,
 				'path': filepath
 			})
-			print('added file', filename)
 		elif filepath.startswith(search_path):
 			filepath = filepath[len(search_path):].strip('/').split('/')[0]
 			if filepath and filepath not in added_folder_names:
@@ -293,6 +292,7 @@ async def view_packages(request):
 			version_id=version_id
 		)
 
+
 @routes.get('/versions/{version}/downloads/{name}/{dir:.*}')
 async def view_packages(request):
 	version_id = request.match_info['version']
@@ -301,8 +301,6 @@ async def view_packages(request):
 	version_json = await fetch_version_json(version_id)
 	package_url = version_json['downloads'][name]['url']
 	show_class_files = request.query.get('class', 'false').lower() == 'true'
-
-	print(package_url)
 
 	if package_url.endswith('.jar'):
 		if '.' in directory:
