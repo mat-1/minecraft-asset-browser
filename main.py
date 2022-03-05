@@ -315,12 +315,15 @@ async def view_packages(request):
 				files=jar_files,
 				jarname=name,
 				path=directory,
-				show_class_files=show_class_files
+				show_class_files=show_class_files,
+				jar_url=package_url
 			)
 	else:
+		return web.HTTPFound(package_url)
 		async with s.get(package_url) as r:
 			data = await r.read()
 		ext = name.split('.')[-1]
+
 	mimetype = mimetypes.get(ext, 'text/plain')
 	data = await open_jar_file(package_url, directory)
 	if ext == 'class':
@@ -333,24 +336,12 @@ async def view_packages(request):
 		content_type=mimetype,
 		charset='utf8',
 		headers={
-			'Access-Control-Allow-Origin': '*'
+			'Access-Control-Allow-Origin': '*',
+			'cache-control': 'max-age=86400'
 		}
 	)
 
 
-
-# @routes.get('/versions/{version}/packages')
-# async def view_packages(request):
-# 	version_id = request.match_info['version']
-
-# 	return web.HTTPFound(f'/versions/{version_id}/packages/')
-
-
-# @routes.get('/objects/{hash}/{name}')
-# async def view_version_redirect(request):
-# 	hash = request.match_info['hash']
-# 	name = request.match_info['name']
-# 	return web.HTTPFound(f'/objects/{hash}/{name}/')
 
 mimetypes = {
 	'png': 'image/png',
@@ -359,36 +350,6 @@ mimetypes = {
 	'txt': 'text/plain',
 	'mus': 'application/vnd.musician'
 }
-
-
-# @routes.get('/objects/{hash}/{name}/{path:.*}')
-# async def view_objects(request):
-# 	hash = request.match_info['hash']
-# 	name = request.match_info['name']
-# 	path = request.match_info['path']
-# 	url = f'https://launcher.mojang.com/v1/objects/{hash}/{name}'
-# 	if name.endswith('.jar'):
-# 		if '.' in path:
-# 			ext = path.rsplit('.', 1)[-1]
-# 		else:
-# 			ext = ''
-# 		if ext == '':
-# 			jar_files = await get_jar_files(url, '/' + path)
-# 			return Template(
-# 				'jar_index.html',
-# 				files=jar_files,
-# 				jarhash=hash,
-# 				jarname=name,
-# 				path=path
-# 			)
-# 		else:
-# 			data = await open_jar_file(url, path)
-# 	else:
-# 		async with s.get(url) as r:
-# 			data = await r.read()
-# 		ext = name.split('.')[-1]
-# 	mimetype = mimetypes.get(ext, 'text/plain')
-# 	return web.Response(body=data, content_type=mimetype)
 
 
 
@@ -406,7 +367,7 @@ async def clear_caches():
 		for assetindexurl in dict(package_objects_cache):
 			cachetime = package_objects_cache[assetindexurl]['last_updated']
 			if time.time() - cachetime > 60 * 10:
-				del package_objects_cache[cachetime]
+				del package_objects_cache[assetindexurl]
 		await asyncio.sleep(60)
 
 

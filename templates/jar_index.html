@@ -8,7 +8,7 @@
 {% endblock %}
 
 {% block main %}
-<h1>{{ version_id }}/{{ jarname }}{% if path %}/{{ path }}{% endif %}</h1>
+<h1>{{ version_id }}/{{ jarname }}{% if path %}/{{ path }}{% endif %}</h1> {% if jar_url %}<a href="{{ jar_url }}" class="downloadButton">Download {{ jarname }}.jar</a>{% endif %}
 <ul class="folderlist">
 	{% for file in files %}
 		{% if '.' in file.fullpath.split('/')[-1] %}
