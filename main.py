@@ -236,6 +236,9 @@ async def view_packages_redirect(request):
 async def view_packages(request):
 	version_id = request.match_info['version']
 	directory = request.match_info['dir']
+	if directory != '/' and directory.endswith('/'):
+		raise web.HTTPFound(location=f'/versions/{version_id}/packages/' + directory.strip('/'))
+
 	version_json = await fetch_version_json(version_id)
 	assetindex_url = version_json['assetIndex']['url']
 	assetindex_id = version_json['assetIndex']['id']
