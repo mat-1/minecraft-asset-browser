@@ -6,7 +6,6 @@ import zipfile
 import io
 import time
 import asyncio
-import hashlib
 
 routes = web.RouteTableDef()
 
@@ -373,8 +372,9 @@ async def clear_caches():
 				del package_objects_cache[assetindexurl]
 		await asyncio.sleep(60)
 
+loop = asyncio.get_event_loop()
 
-asyncio.ensure_future(clear_caches())
+loop.create_task(clear_caches())
 app = web.Application(middlewares=[main_middleware])
 app.add_routes(routes)
-web.run_app(app)
+web.run_app(app, loop=loop)
