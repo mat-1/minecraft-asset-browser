@@ -111,19 +111,17 @@ async def main_middleware(request, handler):
 		raise e
 	return resp
 
-s = aiohttp.ClientSession()
-
 cached_version_id_to_url = {}
 
-async def fetch_versions_json():
+async def fetch_versions_json(s: aiohttp.ClientSession):
 	async with s.get('https://launchermeta.mojang.com/mc/game/version_manifest.json') as r:
 		return await r.json()
 
-async def fetch_version_url(version_id):
+async def fetch_version_url(version_id: str, s: aiohttp.ClientSession):
 	global cached_version_id_to_url
 	if version_id in cached_version_id_to_url:
 		return cached_version_id_to_url[version_id]
-	version_manifest = await fetch_versions_json()
+	version_manifest = await fetch_versions_json(s)
 	versions = version_manifest['versions']
 	for version in versions:
 		if version['id'] == version_id:
@@ -132,14 +130,14 @@ async def fetch_version_url(version_id):
 	else:
 		return
 
-async def fetch_version_json(version_id):
-	version_url = await fetch_version_url(version_id)
+async def fetch_version_json(version_id: str, s: aiohttp.ClientSession):
+	version_url = await fetch_version_url(version_id, s)
 	if version_url is None:
 		raise web.HTTPNotFound()
 	async with s.get(version_url) as r:
 		return await r.json()
 
-async def get_jar_files(url, search_path='/', show_classfiles=False):
+async def get_jar_files(url: str, s: aiohttp.ClientSession, search_path: str='/', show_classfiles: bool=False):
 	global cached_zipfiles
 	search_path = search_path.rstrip('/')
 
@@ -215,13 +213,15 @@ async def open_jar_file(url, open_filename):
 
 @routes.get('/versions')
 async def versions(request):
-	data = await fetch_versions_json()
+	s = aiohttp.ClientSession()
+	data = await fetch_versions_json(s)
 	return Template('versions.html', data=data)
 
 @routes.get('/versions/{version}')
 async def view_version(request):
+	s = aiohttp.ClientSession()
 	version_id = request.match_info['version']
-	data = await fetch_version_json(version_id)
+	data = await fetch_version_json(version_id, s)
 	return Template('version.html', data=data)
 
 @routes.get('/packages/{hash}/{name}')
@@ -238,7 +238,8 @@ async def view_packages(request):
 	if directory != '/' and directory.endswith('/'):
 		raise web.HTTPFound(location=f'/versions/{version_id}/packages/' + directory.strip('/'))
 
-	version_json = await fetch_version_json(version_id)
+	s = aiohttp.ClientSession()
+	version_json = await fetch_version_json(version_id, s)
 	assetindex_url = version_json['assetIndex']['url']
 	assetindex_id = version_json['assetIndex']['id']
 	if (
@@ -300,7 +301,8 @@ async def view_packages(request):
 	version_id = request.match_info['version']
 	name = request.match_info['name']
 	directory = request.match_info['dir']
-	version_json = await fetch_version_json(version_id)
+	s = aiohttp.ClientSession()
+	version_json = await fetch_version_json(version_id, s)
 	package_url = version_json['downloads'][name]['url']
 	show_class_files = request.query.get('class', 'false').lower() == 'true'
 
@@ -310,7 +312,7 @@ async def view_packages(request):
 		else:
 			ext = ''
 		if ext == '':
-			jar_files = await get_jar_files(package_url, '/' + directory, show_class_files)
+			jar_files = await get_jar_files(package_url, s, '/' + directory, show_class_files)
 			return Template(
 				'jar_index.html',
 				version_id=version_id,
@@ -377,4 +379,4 @@ loop = asyncio.get_event_loop()
 loop.create_task(clear_caches())
 app = web.Application(middlewares=[main_middleware])
 app.add_routes(routes)
-web.run_app(app, loop=loop)
+web.run_app(app, loop=loop, port=10573)

@@ -5,10 +5,10 @@ description = ""
 authors = ["mat <git@matdoes.dev>"]
 license = "MIT"
 readme = "README.md"
-packages = [{include = "minecraft_asset_browser"}]
+packages = [{ include = "minecraft_asset_browser" }]
 
 [tool.poetry.dependencies]
-python = "^3.11"
+python = "^3.10"
 aiohttp = "^3.8.5"
 Jinja2 = "^3.1.2"
 
